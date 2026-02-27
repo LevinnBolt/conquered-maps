@@ -81,8 +81,13 @@ export default function RoomView() {
   }, [roomId, loadRoom]);
 
   const handleSelectTerritory = (chapterNum: number) => {
-    const chapter = chapters[chapterNum - 1];
-    if (!chapter) return;
+    // Re-read chapters from latest room data to avoid stale references
+    const latestChapters: Chapter[] = room?.syllabus_data?.chapters || [];
+    const chapter = latestChapters.find((c: Chapter) => c.chapterNumber === chapterNum);
+    if (!chapter) {
+      toast.error("Chapter data not found. Try refreshing.");
+      return;
+    }
     setActiveChapterNum(chapterNum);
     setActiveQuiz(chapter);
   };

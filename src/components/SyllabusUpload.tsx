@@ -42,7 +42,7 @@ export default function SyllabusUpload({ roomId, onSyllabusProcessed }: Props) {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      toast.success("Syllabus processed! 7 territories created.");
+      toast.success(`Syllabus processed! ${data?.chapters || 7} territories created.`);
       onSyllabusProcessed();
     } catch (err: any) {
       toast.error(err.message || "Failed to process syllabus");
