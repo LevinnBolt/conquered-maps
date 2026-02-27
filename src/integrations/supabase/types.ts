@@ -153,6 +153,7 @@ export type Database = {
         Args: { _room_id: string; _user_id: string }
         Returns: boolean
       }
+      join_room_with_code: { Args: { _room_code: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never

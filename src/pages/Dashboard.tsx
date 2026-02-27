@@ -81,38 +81,18 @@ export default function Dashboard() {
     if (!joinCode.trim()) return;
     setLoading(true);
     try {
-      const { data: room, error } = await supabase
-        .from("rooms")
-        .select("*")
-        .eq("room_code", joinCode.toUpperCase())
-        .single();
-      if (error || !room) throw new Error("Room not found");
-
-      // Get member count for color assignment
-      const { count } = await supabase
-        .from("room_members")
-        .select("*", { count: "exact", head: true })
-        .eq("room_id", room.id);
-
-      const colorIndex = (count || 0) % USER_COLORS.length;
-
-      const { error: joinError } = await supabase.from("room_members").insert({
-        room_id: room.id,
-        user_id: user!.id,
-        color: USER_COLORS[colorIndex],
+      const { data: joinedRoomId, error } = await supabase.rpc("join_room_with_code", {
+        _room_code: joinCode.toUpperCase(),
       });
-      if (joinError) {
-        if (joinError.code === "23505") {
-          navigate(`/room/${room.id}`);
-          return;
-        }
-        throw joinError;
+
+      if (error || !joinedRoomId) {
+        throw new Error(error?.message || "Room not found");
       }
 
       toast.success("Joined room!");
-      navigate(`/room/${room.id}`);
+      navigate(`/room/${joinedRoomId}`);
     } catch (err: any) {
-      toast.error(err.message);
+      toast.error(err.message || "Failed to join room");
     } finally {
       setLoading(false);
     }
